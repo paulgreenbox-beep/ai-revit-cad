@@ -1,15 +1,10 @@
 # AI Revit CAD — Experimental
 
-A Rust + Makepad BIM/CAD application with a unified project Document and
-experimental structural, geological and foundation modules. This application
-is an independent nested workspace in Rust Makepad Toolkit. It does not replace
-or change the Toolkit workspace, tools or history.
+AI Revit CAD is a standalone public Rust and Makepad BIM/CAD repository. Its root is the Cargo workspace for the application; the project no longer depends on a neighboring Rust Makepad Toolkit checkout.
 
-The application source is MIT. Third-party code retains its own licenses;
-see [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-This is a source distribution, not a certified engineering product.
+The application source is MIT licensed. Third-party components retain their own licenses; see [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). This is an experimental source distribution, not a certified engineering product.
 
-## Modules and current status
+## Modules and status
 
 | Module | Available source surface | Status |
 |---|---|---|
@@ -20,101 +15,62 @@ This is a source distribution, not a certified engineering product.
 | GEO-SLOPE | Existing planar/circular dry-ground methods, Fellenius/Bishop and bounded critical search | Experimental / Partial; method-specific physical limits remain |
 | STRUCTURAL | Bounded linear-elastic truss/frame core, typed loads, reactions, parameterized multi-section steel geometry | Partial; dense limits remain 64 nodes / 128 members; no full material-specific code compliance |
 | FOUNDATION | Existing rigid raft / compression-only contact, explicit assumed bedding stiffness, source-bound reactions and ground context | Partial; spring displacements are preliminary estimates |
-| Native UI / automation | Makepad 2D/3D source; manual app input | Experimental; public clean-build is separate from native acceptance |
+| Native UI / automation | Makepad 2D/3D source; manual app input | Experimental; source/build checks do not establish native acceptance |
 
-Normative ULS bearing capacity, code-verified layered settlement, reinforcement,
-punching, groundwater/pore pressure, piles and a complete building safety check
-are **not** declared implemented. A positive numerical result is not engineering
-approval. Synthetic geology is explicitly marked and does not represent a real
-site. Mesh colors and visual triangles are not the source of calculation data.
+Normative ULS bearing capacity, code-verified layered settlement, reinforcement, punching, groundwater/pore pressure, piles and a complete building safety check are **not** declared implemented. A positive numerical result is not engineering approval. Synthetic geology is explicitly marked and does not represent a real site. Mesh colors and visual triangles are not the source of calculation data.
 
-### Public Windows accessibility boundary
+## Native UI and GPU limits
 
-The local development bridge depends on checked action tickets/lifetime fences
-not exported by the public Toolkit baseline. This distribution explicitly does
-not register that UIA provider. It does not alias checked operations to the
-legacy bridge or weaken stale-object checks. UIA fixture modes are rejected;
-manual Makepad input remains independent. Native, Remote and Linux GUI acceptance
-are not inherited from any previous development snapshot.
+The public distribution does not provide the private Windows UI Automation action hooks used by local development tooling. UIA fixture modes are rejected; manual Makepad input remains available. Native, Remote and Linux GUI acceptance must be established separately.
 
-Raw D3D11 device/texture access, GPU selection policy, viewport GPU export and
-native GPU profiling also depend on SDK hooks absent from the public pin.
-They explicitly return UNSUPPORTED_PUBLIC_SDK; adapter identity and VRAM remain
-unknown. Required-GPU requests are not satisfied by a CPU fallback. The normal
-Makepad draw path is unchanged; GPU/native qualification remains NOT_TESTED.
+Raw D3D11 device/texture access, GPU selection policy, viewport GPU export and native GPU profiling depend on hooks absent from the pinned public SDK. Those operations report **UNSUPPORTED_PUBLIC_SDK**; adapter identity and VRAM remain unknown. A required-GPU request is not satisfied by a CPU fallback. The ordinary Makepad draw path is unchanged, and GPU/native qualification remains **NOT_TESTED**.
 
-The nine proposed GEO/Foundation desktop agent routes are not registered in this
-source snapshot. The ordinary app API is loopback-only; publication does not
-start an application, service or API listener.
+The nine proposed GEO/Foundation desktop agent routes are not registered in this source snapshot. The ordinary app API is loopback-only; publication does not start an application, service or API listener.
 
 ## Build
 
-Requirements: Git, a current stable Rust toolchain with edition 2024 support,
-and Makepad platform build tools. Windows needs MSVC C++ Build Tools and the
-Windows SDK. Python 3.11+ is optional for source-bound engineering examples.
+Requirements: Git, a stable Rust toolchain with edition 2024 support, and Makepad platform build tools. Windows builds require MSVC C++ Build Tools and the Windows SDK. Python 3.11+ is optional for source-bound engineering examples.
 
-From the repository root (PowerShell):
+From PowerShell:
 
-```powershell
-./tools/bootstrap-makepad.ps1
-cd apps/ai-revit-cad
-cargo build --locked -p ai_revit_desktop --bin ai_revit_desktop -j1
-cargo test --locked --workspace --all-targets -j1 -- --test-threads=1
-# Additional independent viewer-core tests:
-cargo test --locked --manifest-path deps/viewer_core/Cargo.toml -j1 -- --test-threads=1
-```
+    git clone https://github.com/paulgreenbox-beep/ai-revit-cad.git
+    cd ai-revit-cad
+    ./tools/bootstrap-makepad.ps1
+    cargo check --locked -p ai_revit_desktop -j1
+    cargo build --locked -p ai_revit_desktop --bin ai_revit_desktop -j1
+    cargo test --locked --workspace --all-targets -j1 -- --test-threads=1
+    cargo test --locked --manifest-path deps/viewer_core/Cargo.toml -j1 -- --test-threads=1
 
-The repository bootstrap fetches the public Makepad revision
-`105158e08c89d47f57af4621420ed68eb3a147ce` into the ignored root `.deps/makepad`.
-Use a clean checkout of that revision for reproducibility. No operator-specific
-folder, private SDK, submodule credential or project dataset is required.
+The bootstrap fetches the public Makepad revision 105158e08c89d47f57af4621420ed68eb3a147ce into the ignored repository-root .deps/makepad directory and verifies that checkout. It does not need a neighboring Toolkit tree, private SDK, submodule credential or project dataset. The Makepad SDK remains a separately licensed dependency; see [third-party notices](THIRD_PARTY_NOTICES.md).
 
-For a source-bound GEO/Foundation analysis build:
+## Source-bound GEO/Foundation example
 
-```powershell
-$env:AI_REVIT_GF_COMPILED_SOURCE_MANIFEST_SHA256 = python tools/source_fingerprint.py
-cargo build --locked -p ai_revit_core --example geo_foundation_cli -j1
-cargo build --locked -p ai_revit_desktop --bin ai_revit_desktop -j1
-$env:AI_REVIT_GF_SOURCE_MANIFEST_SHA256 = $env:AI_REVIT_GF_COMPILED_SOURCE_MANIFEST_SHA256
-$env:AI_REVIT_GF_EXECUTABLE_SHA256 = (Get-FileHash target/debug/ai_revit_desktop.exe -Algorithm SHA256).Hash
-# Run manually when ready; not a native acceptance certificate:
-./target/debug/ai_revit_desktop.exe
-```
+The CLI takes exactly one bounded JSON request file as its command-line argument. The demo_state operation constructs synthetic source data. Analyses are explicit operations; Open, Undo and Redo do not run a solver.
 
-The fingerprint binds application source, lock and the pinned clean SDK revision;
-it is not a full compiler/OS input trace. Source changes require rebuilding and a
-new fingerprint. The CLI reads one bounded JSON request from stdin or a request
-file. `demo_state` only constructs synthetic source data:
+From the repository root, after bootstrapping the SDK:
 
-```powershell
-'{"operation":"demo_state"}' | ./target/debug/examples/geo_foundation_cli.exe
-```
+    $env:AI_REVIT_GF_COMPILED_SOURCE_MANIFEST_SHA256 = python tools/source_fingerprint.py
+    cargo build --locked -p ai_revit_core --example geo_foundation_cli -j1
+    cargo build --locked -p ai_revit_desktop --bin ai_revit_desktop -j1
+    $env:AI_REVIT_GF_SOURCE_MANIFEST_SHA256 = $env:AI_REVIT_GF_COMPILED_SOURCE_MANIFEST_SHA256
+    $env:AI_REVIT_GF_EXECUTABLE_SHA256 = (Get-FileHash target/debug/ai_revit_desktop.exe -Algorithm SHA256).Hash
+    ./target/debug/ai_revit_desktop.exe
 
-See [the typed Core contract](crates/core/src/geo_foundation.rs) and
-[the CLI request interface](crates/core/examples/geo_foundation_cli.rs). Analyses are
-explicit operations. Open, Undo and Redo do not run a solver.
+The fingerprint binds the application source, lock and pinned clean SDK revision; it is not a full compiler/OS input trace. Source changes require rebuilding and a new fingerprint. The current standalone fingerprint and verification details belong in [validation.json](validation.json).
+
+For a synthetic CLI request:
+
+    [IO.File]::WriteAllText('demo-request.local.json', '{"operation":"demo_state"}')
+    ./target/debug/examples/geo_foundation_cli.exe demo-request.local.json
+
+See [the typed Core contract](crates/core/src/geo_foundation.rs) and [the CLI request interface](crates/core/examples/geo_foundation_cli.rs).
 
 ## Tests and distribution boundary
 
-Small first-party synthetic inputs and independent high-precision numerical
-references are included as test **source**. Large generated report archives are
-not committed. Archive/persistence tests explicitly initialize fresh synthetic
-fixtures in a new process-owned temporary directory, using the current solver
-source identity. Their generated numbers are setup data, not independent goldens.
-The separate historical-identity control verifies Stale behavior; it is not
-proof from a historical solver run. Numerical golden tests remain separate.
+Small first-party synthetic inputs and independent high-precision numerical references are included as test source. Large generated report archives are not committed. Archive/persistence tests explicitly initialize fresh synthetic fixtures in a new process-owned temporary directory, using the current solver source identity. Their generated numbers are setup data, not independent goldens. The separate historical-identity control verifies Stale behavior; it is not proof from a historical solver run. Numerical golden tests remain separate.
 
-Hardware CUDA tests require an explicitly selected supported NVIDIA adapter and
-remain ignored without that opt-in. A Rust test or successful compile does not
-prove native GUI, GPU, engineering or release acceptance.
+Hardware CUDA tests require an explicitly selected supported NVIDIA adapter and remain ignored without that opt-in. A Rust test or successful compile does not prove native GUI, GPU, engineering or release acceptance.
 
-Excluded: credentials/tokens, private configurations, user-profile paths, customer
-and site materials, SAD RASTSVET materials, FH-87 project meshes/BREP/identity
-maps, captures, historical acceptance bundles, local persistence-driver profiles,
-SDK/vendor assets/fonts, executables, `target/`, caches and generated reports.
-The generic mesh decoder and procedural synthetic viewer scenes remain available.
-There is no DWG/STEP import/export promise without a real licensed backend.
+Excluded: credentials/tokens, private configurations, user-profile paths, customer and site materials, SAD RASTSVET materials, FH-87 project meshes/BREP/identity maps, captures, old validation bundles, local persistence-driver profiles, SDK/vendor assets/fonts, executables, target/, caches and generated reports. The generic mesh decoder and procedural synthetic viewer scenes remain available. There is no DWG/STEP import/export promise without a real licensed backend.
 
-See [PUBLICATION.md](PUBLICATION.md) for the checked public-source boundary and
-actual build/test results. The original working checkouts and Toolkit history
-are preserved.
+The current standalone verification record is [validation.json](validation.json). Historical Toolkit-package results are preserved separately in [docs/validation-toolkit-snapshot.json](docs/validation-toolkit-snapshot.json); they are not a rerun or acceptance record for this standalone repository. See [PUBLICATION.md](PUBLICATION.md) for publication origin, repository boundaries and validation limits.

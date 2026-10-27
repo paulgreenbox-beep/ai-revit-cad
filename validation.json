@@ -1,63 +1,122 @@
 {
-  "schema": "ai-revit-cad-publication-validation-v1",
+  "schema": "ai-revit-cad-standalone-validation-v1",
   "date_utc": "2026-10-27",
-  "scope": "Source/build/headless verification only. No native GUI, GPU hardware or engineering certification.",
-  "platform": "Windows x86_64 / MSVC",
-  "rustc": "1.97.1 (8bab26f4f 2026-07-14)",
-  "cargo": "1.97.1 (c980f4866 2026-06-30)",
+  "scope": "Standalone repository relocation, source/build and bounded headless persistence verification. No native GUI, hardware GPU, engineering or certification acceptance.",
+  "repository": "https://github.com/paulgreenbox-beep/ai-revit-cad",
+  "origin_toolkit_commit": "2dd70fc0497d5b3065197cffb3943eab9a261103",
+  "import_commit": "bb0bb25e6111d98cab5caaa88ce961b79a462a83",
+  "source_fingerprint": "a0fc6365cbbb32ac9a9471808f57b3b408776eb10339e9a6323f53da9f0775ed",
+  "fingerprint_scope": "Rust/manifests/PTX/Python/PowerShell helpers, license notices/locks, clean SDK Git revision; JSON fixtures/docs and compiler/OS inputs are outside this helper scope.",
   "makepad_revision": "105158e08c89d47f57af4621420ed68eb3a147ce",
-  "source_fingerprint": "03b2ca295f0a747f92164f5f88a5dcad9e6a7ed1d62a4ccc25ffe1804d1e8030",
-  "fingerprint_scope": "Application Rust/manifests/PTX/Python/license notices/locks and clean SDK revision; not compiler/OS tracing or a hash of every fixture/document.",
+  "platform": "Windows x86_64 MSVC; Rust/Cargo 1.97.1",
+  "source_relocation": {
+    "implementation_files_byte_identical": 266,
+    "mathematical_and_golden_sources_unchanged": true,
+    "cargo_lock_sha256": "4194b6ba9af97d9b9ac45655e40f77f496cd467106ee19e9d3b1ed8e3a3af190",
+    "registry_versions_and_licenses_unchanged": true,
+    "all_local_cargo_manifests_inside_repository": true,
+    "neighboring_toolkit_required": false
+  },
   "commands": [
     {
-      "command": "cargo check --offline --locked -p ai_revit_desktop -j1",
-      "exit_code": 0
+      "command": "cargo test --offline --locked -p geo_core -p foundation_core -p structural_core -p structural_configurator --lib -j1 -- --test-threads=1",
+      "exit_code": 0,
+      "passed": 106,
+      "failed": 0,
+      "ignored": 0,
+      "filtered_out": 0
     },
     {
-      "command": "cargo test --offline --locked --workspace --all-targets --no-fail-fast -j1 -- --test-threads=1",
+      "command": "cargo test --offline --locked -p ai_revit_core --lib geo_foundation -j1 -- --test-threads=1",
       "exit_code": 0,
-      "targets": 50,
-      "passed": 953,
+      "passed": 14,
       "failed": 0,
-      "ignored": 1
+      "ignored": 0,
+      "filtered_out": 181
     },
     {
       "command": "cargo test --offline --locked --manifest-path deps/viewer_core/Cargo.toml -j1 -- --test-threads=1",
       "exit_code": 0,
-      "targets": 2,
       "passed": 26,
       "failed": 0,
-      "ignored": 0
+      "ignored": 0,
+      "filtered_out": 0
     },
     {
       "command": "cargo build --offline --locked -p ai_revit_desktop --bin ai_revit_desktop -p ai_revit_core --example geo_foundation_cli -j1",
       "exit_code": 0
     }
   ],
-  "synthetic_cli_lifecycle": {
-    "fresh_processes": 20,
-    "assertions": 82,
+  "test_total_passed": 146,
+  "synthetic_cli_smoke": {
+    "fresh_processes": 4,
+    "assertions": 11,
     "failed": 0,
-    "scope": "Explicit synthetic create, query, structural/foundation calculation, Save/Open, edit/stale, Undo/Redo and rejection controls; separate local publication verifier.",
-    "archive_distribution": "Process receipts and generated calculation archives excluded from source Git tree."
+    "checks": [
+      {
+        "name": "one_document_native7",
+        "match": true
+      },
+      {
+        "name": "synthetic_four_boreholes",
+        "match": true
+      },
+      {
+        "name": "supported_structural_reactions",
+        "match": true
+      },
+      {
+        "name": "configured_reactions_bound",
+        "match": true
+      },
+      {
+        "name": "support_actions_preserved",
+        "match": true
+      },
+      {
+        "name": "document_ids_materials_loads_archives_preserved",
+        "match": true
+      },
+      {
+        "name": "foundation_archive_current",
+        "match": true
+      },
+      {
+        "name": "reopen_preserves_saved_bytes",
+        "match": true
+      },
+      {
+        "name": "creation_source_preserved",
+        "match": true
+      },
+      {
+        "name": "compiled_source_identity",
+        "match": true
+      },
+      {
+        "name": "engineering_not_approved",
+        "match": true
+      }
+    ],
+    "scope": "Create synthetic model; calculate supported structural reactions; bind and save foundation; reopen in another process; preserve IDs/materials/loads/archives and saved bytes."
   },
-  "local_builds_not_distributed": [
+  "local_executables_not_distributed": [
     {
       "file": "ai_revit_desktop.exe",
-      "sha256": "6fc277e79044d2a6818dd6ca27053df3c0b4dfbf67ea1d42d4c57c4e2562074c"
+      "sha256": "03242803096bc3e249ed0a33f389a9468988757bd8e690716b4b4197eb7c4ef0"
     },
     {
       "file": "geo_foundation_cli.exe",
-      "sha256": "fd3f8fea22302c3c95c95ae429d9af3590aee571f01b0e8ef1ab1dad1f2861c3"
+      "sha256": "4c765c20e69f74260c38d341d509d3ae7ff9a556317448635cb150aee0779bb3"
     }
   ],
-  "limits": {
-    "native_2d_3d": "NOT_TESTED",
-    "gpu_hardware": "NOT_TESTED",
-    "windows_checked_uia": "UNSUPPORTED_PUBLIC_TOOLKIT",
-    "raw_gpu_diagnostics": "UNSUPPORTED_PUBLIC_SDK",
-    "engineering_modules": "EXPERIMENTAL_PARTIAL",
-    "normative_certification": "NOT_ASSERTED",
-    "cuda_test": "One hardware test ignored without explicit supported NVIDIA adapter opt-in."
-  }
+  "prior_workspace_test_record": "docs/validation-toolkit-snapshot.json",
+  "full_workspace_suite": "Not rerun for this layout-only move; prior full suite is historical. Current focused tests and fresh standalone build are listed above.",
+  "native_2d_3d": "NOT_TESTED",
+  "gpu_hardware": "NOT_TESTED",
+  "engineering_modules": "EXPERIMENTAL_PARTIAL",
+  "normative_certification": "NOT_ASSERTED",
+  "windows_checked_uia": "UNSUPPORTED_PUBLIC_TOOLKIT",
+  "raw_gpu_hooks": "UNSUPPORTED_PUBLIC_SDK",
+  "cuda_hardware_test": "Not selected by this focused relocation verification."
 }

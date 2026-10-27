@@ -1,66 +1,46 @@
-# Public source distribution
+# Publication record
 
-The CAD package is isolated under `apps/ai-revit-cad/`. The original Toolkit
-tracked tree, root workspace and history are preserved. This is not deployment
-of the local SDK, a GUI acceptance certificate or engineering certification.
+## Origin and repository history
 
-## Components
+AI Revit CAD was previously published as the apps/ai-revit-cad subtree of [Rust Makepad Toolkit](https://github.com/paulgreenbox-beep/rust-makepad-toolkit). The source publication commit was 2dd70fc0497d5b3065197cffb3943eab9a261103.
 
-The source contains the unified BIM Document/history/persistence, geometry,
-2D drafting and DXF subset, the independent viewer core, GEO data/queries,
-existing GEO-SLOPE mathematics/reporting/jobs/host, structural math and
-multi-section steel configuration, and rigid foundation contact integration.
-GEO, FOUNDATION and STRUCTURAL remain **Experimental / Partial**.
+This repository is the standalone publication at [paulgreenbox-beep/ai-revit-cad](https://github.com/paulgreenbox-beep/ai-revit-cad). Its extracted Git subtree history begins at bb0bb25e6111d98cab5caaa88ce961b79a462a83, derived from that source publication. The move gives the project its own repository root and Cargo workspace; it does not claim new engineering behavior or alter the mathematical methods and numerical goldens.
 
-The minimal vendored CADCraft DXF crate keeps its original MIT/Apache notices.
-No DWG backend, private site model, font bundle or SDK tree is redistributed.
-See [third-party notices](THIRD_PARTY_NOTICES.md) and
-[exclusion rules](excluded-files.json).
+## Standalone dependency boundary
 
-## Reproducibility and limitations
+Clone this repository and run [the bootstrap script](tools/bootstrap-makepad.ps1) from its root. The script fetches and verifies the public Makepad SDK at 105158e08c89d47f57af4621420ed68eb3a147ce under the ignored root .deps/makepad. Application manifests use that root-local SDK path. A neighboring Toolkit checkout, private SDK, or Toolkit-only helper crate is not required.
 
-- Separate CAD workspace and lock; Viewer is included as a dependency and has its own
-  standalone workspace/lock. Both use the same audited registry versions.
-- Makepad is a clean public checkout at
-  `105158e08c89d47f57af4621420ed68eb3a147ce`, fetched by the unchanged repository
-  bootstrap into ignored `.deps/makepad`.
-- Application source is normalized to LF as required by the repository
-  attributes. Numerical goldens were not replaced with solver output.
-- Large archive fixtures are generated only by explicit test setup. Production
-  project Open and formatting do not run a solver. A synthetic old-identity
-  fixture tests Stale behavior; it is not historical solver evidence.
-- Private checked UIA and raw D3D11 observation/readback/profiling hooks are not
-  part of the pinned public SDK. The public boundary is explicitly unsupported;
-  it does not invent GPU identity/VRAM or weaken required-GPU admission.
-- Native 2D/3D workflows, GPU hardware qualification and normative engineering
-  methods are not accepted by a successful compile or unit test.
+The Viewer source is included under deps/viewer_core with its own workspace boundary. The public source distribution preserves the MIT project license and third-party notices. The minimal vendored CADCraft DXF crate retains its MIT/Apache notices. No DWG backend, private site model, font bundle or SDK/vendor tree is redistributed. See [LICENSE](LICENSE), [third-party notices](THIRD_PARTY_NOTICES.md) and [exclusion rules](excluded-files.json).
 
-## Validation
+The repository contains the unified BIM Document/history/persistence, geometry, 2D drafting and supported DXF subset, Viewer core, GEO data/queries, existing GEO-SLOPE mathematics/reporting/jobs/host, structural math and multi-section steel configuration, and rigid foundation contact integration. GEO, FOUNDATION and STRUCTURAL remain **Experimental / Partial**.
 
-Verified on 2026-10-27 with Rust/Cargo 1.97.1, Windows x86_64 MSVC and the clean
-public Makepad pin above. Cargo used the committed locks, one build job and one
-test thread. Compiler warnings remain; no build or test failure remains.
+## Validation records
 
-| Check | Observed result |
+The standalone checkout's current local verification, source fingerprint and build hashes are recorded in [validation.json](validation.json). Read that file for evidence tied to this repository; a source fingerprint or local executable hash is not a reproducible-build guarantee.
+
+On 2026-10-27 the standalone checkout passed 106 pure-module tests, 14 focused
+Document GEO/Foundation tests and 26 Viewer tests (146 passed, no failures).
+The desktop executable and GEO/Foundation CLI built against its own clean SDK.
+Four fresh CLI processes passed 11 checks covering synthetic creation,
+structural-to-foundation reactions, saving and reopening with preserved project
+IDs, loads and archives. The earlier full workspace suite was not repeated for
+this layout-only move; all 266 implementation files and numerical goldens were
+preserved. Compiler warnings remain. No GUI was launched.
+
+The previous Toolkit package had the following historical results:
+
+| Historical check in the Toolkit package | Recorded result |
 |---|---|
-| Desktop `cargo check` | PASS |
-| Workspace, all targets | 953 passed, 0 failed, 1 hardware CUDA test ignored |
-| Standalone Viewer | 26 passed, 0 failed |
-| Ordinary desktop EXE and GEO/Foundation CLI build | PASS |
-| Synthetic CLI lifecycle | 20 fresh processes, 82 assertions, 0 failures |
-| Native 2D/3D and hardware GPU qualification | NOT_TESTED |
+| Workspace tests | 953 passed, 0 failed, 1 hardware CUDA test ignored |
+| Standalone Viewer tests | 26 passed, 0 failed |
+| Synthetic headless lifecycle | 20 fresh processes, 82 assertions, 0 failures |
 
-The CLI lifecycle checks explicit synthetic creation, structural/foundation
-calculations, Save/Open in another process, editing/stale state, Undo/Redo and
-invalid/unsupported input refusal. It does not launch the Makepad GUI.
+These figures belong to the earlier package validation and were not rerun by extracting the standalone repository. The complete historical record is preserved in [docs/validation-toolkit-snapshot.json](docs/validation-toolkit-snapshot.json). It does not establish that a fresh standalone clone builds or passes the same checks.
 
-Application source fingerprint:
-`03b2ca295f0a747f92164f5f88a5dcad9e6a7ed1d62a4ccc25ffe1804d1e8030`.
-The helper's declared scope excludes JSON fixtures and documentation; Git commit
-identity covers the complete published tree. See [validation.json](validation.json)
-for commands, counts and hashes of the locally built executables. Those hashes
-identify this local build and are not a reproducible-build guarantee.
+## Limits and acceptance
 
-Local logs, executable files, process receipts and generated calculation archives
-stay outside Git. No old GEO-SLOPE, Foundation or native acceptance is promoted by
-this source publication.
+The public Makepad pin does not include the private checked Windows UIA action hooks or raw D3D11 device/texture, GPU selection, viewport export and profiling hooks used in local development. The public boundary rejects UIA fixture modes and reports **UNSUPPORTED_PUBLIC_SDK** for unsupported GPU operations; it does not invent adapter identity or VRAM, weaken required-GPU admission, or treat CPU fallback as satisfying a GPU request.
+
+Native UI workflows, GPU hardware qualification and normative engineering methods are not accepted by a successful source check, compilation, headless test or historical Toolkit result. The application remains an experimental source distribution. This publication makes no native GUI, hardware GPU, engineering or release acceptance claim.
+
+Generated calculation archives, process receipts, local logs and executable files remain outside Git.

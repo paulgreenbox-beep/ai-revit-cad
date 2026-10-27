@@ -2,7 +2,7 @@
   "schema": "ai-revit-cad-registry-license-inventory-v1",
   "scope": "Source dependency inventory. Registry crates and Makepad SDK sources/resources are not redistributed in this application directory; this is not a blanket MIT grant or binary/SDK clearance.",
   "frozen_cargo_lock_sha256": "4194b6ba9af97d9b9ac45655e40f77f496cd467106ee19e9d3b1ed8e3a3af190",
-  "reviewed_metadata_sha256": "0393d93ef35ef4750cfc1b8b6689833f90d42d903ba6357d0ff75346e83c0ea5",
+  "reviewed_metadata_sha256": "5afbfc2529766e28efd9da1c014c5521191dc323cd0615d7cff80ada19d8d166",
   "resolved_package_count": 208,
   "registry_package_count": 87,
   "local_source_package_counts": {
@@ -2219,5 +2219,6 @@
     "11 registry packages retain declared permissive alternatives but their full license documents were not present in the local package directory. They are not copied into this source package.",
     "The separately obtained SDK retains its own component/font licenses and outstanding original-notice questions; no SDK or binary clearance is asserted.",
     "This inventory applies only to the exact lock hash above."
-  ]
+  ],
+  "metadata_relocation_note": "Standalone repository metadata; exact registry package identities/licenses and Cargo.lock are unchanged from the reviewed publication snapshot."
 }

@@ -1,5 +1,6 @@
 # Public source only; all generated state stays local.
 /target/
+**/target/
 /artifacts/
 /reports/
 /verification/

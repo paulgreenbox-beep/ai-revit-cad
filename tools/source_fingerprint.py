@@ -12,7 +12,7 @@ SDK_REVISION = "105158e08c89d47f57af4621420ed68eb3a147ce"
 EXCLUDED = {".git", "target", "artifacts", "reports", ".deps", "__pycache__", "verification", "runtime"}
 
 def fingerprint():
-    sdk = ROOT.parents[1] / ".deps" / "makepad"
+    sdk = ROOT / ".deps" / "makepad"
     revision = subprocess.check_output(["git", "-C", str(sdk), "rev-parse", "HEAD"], text=True).strip()
     if revision != SDK_REVISION:
         raise RuntimeError("SDK differs from the pinned public revision; review compatibility first")
@@ -26,12 +26,12 @@ def fingerprint():
             path = Path(folder)/name
             if path.is_symlink():
                 continue
-            if path.suffix not in {".rs", ".toml", ".ptx", ".py"} and name not in {"Cargo.lock", "LICENSE", "LICENSE-MIT", "LICENSE-APACHE", "NOTICE"}:
+            if path.suffix not in {".rs", ".toml", ".ptx", ".py", ".ps1"} and name not in {"Cargo.lock", "LICENSE", "LICENSE-MIT", "LICENSE-APACHE", "NOTICE"}:
                 continue
             raw = path.read_bytes()
             rows.append({"path":path.relative_to(ROOT).as_posix(), "bytes":len(raw), "sha256":hashlib.sha256(raw).hexdigest()})
     rows.sort(key=lambda row: row["path"])
-    payload = {"schema":"ai-revit-cad-public-source-v1", "scope":"Application Rust/manifests/PTX/helper source, license notices and lock; exact clean SDK Git revision. No compiler/OS SDK tracing.", "makepad_revision":revision, "files":rows}
+    payload = {"schema":"ai-revit-cad-public-source-v1", "scope":"Application Rust/manifests/PTX/Python/PowerShell helper source, license notices and lock; exact clean SDK Git revision. No compiler/OS SDK tracing.", "makepad_revision":revision, "files":rows}
     raw = (json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)+"\n").encode("utf-8")
     return hashlib.sha256(raw).hexdigest(), raw
 
